@@ -1,0 +1,9 @@
+*.log
+*.swp
+*.swo
+*.tmp
+
+.idea/
+.vscode/
+
+*.DS_Store

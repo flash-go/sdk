@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	postgresHostOptKey     = "/postgres/host"
-	postgresPortOptKey     = "/postgres/port"
-	postgresUserOptKey     = "/postgres/user"
-	postgresPasswordOptKey = "/postgres/password"
-	postgresDbOptKey       = "/postgres/db"
+	PostgresHostOptKey     = "/postgres/host"
+	PostgresPortOptKey     = "/postgres/port"
+	PostgresUserOptKey     = "/postgres/user"
+	PostgresPasswordOptKey = "/postgres/password"
+	PostgresDbOptKey       = "/postgres/db"
 )
 
 type PostgresClientConfig struct {
@@ -30,11 +30,11 @@ func NewPostgresClient(config *PostgresClientConfig) *gorm.DB {
 	// Create DSN
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.Cfg.Get(postgresHostOptKey),
-		config.Cfg.Get(postgresPortOptKey),
-		config.Cfg.Get(postgresUserOptKey),
-		config.Cfg.Get(postgresPasswordOptKey),
-		config.Cfg.Get(postgresDbOptKey),
+		config.Cfg.Get(PostgresHostOptKey),
+		config.Cfg.Get(PostgresPortOptKey),
+		config.Cfg.Get(PostgresUserOptKey),
+		config.Cfg.Get(PostgresPasswordOptKey),
+		config.Cfg.Get(PostgresDbOptKey),
 	)
 
 	// Connect to server

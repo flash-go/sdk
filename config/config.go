@@ -3,15 +3,18 @@ package config
 import (
 	"errors"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/flash-go/flash/state"
 )
 
 type Config interface {
+	GetService() string
 	Get(key string) string
 	GetInt(key string) int
 	Set(key, value string) error
+	SetEnvMap(envMap map[string]string)
 }
 
 type config struct {
@@ -27,6 +30,10 @@ func New(state state.State, service string) Config {
 		service: service,
 		state:   state,
 	}
+}
+
+func (c *config) GetService() string {
+	return c.service
 }
 
 func (c *config) Get(key string) string {
@@ -53,4 +60,12 @@ func (c *config) Set(key, value string) error {
 		return c.state.SetValue(k, value)
 	}
 	return err
+}
+
+func (c *config) SetEnvMap(envMap map[string]string) {
+	for env, key := range envMap {
+		if err := c.Set(key, os.Getenv(env)); err != nil {
+			log.Fatalf("failed to create KV [%s]: %v", key, err)
+		}
+	}
 }

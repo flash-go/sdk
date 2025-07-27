@@ -23,6 +23,20 @@ func main() {
 }
 ```
 
+### Get service name
+
+```go
+package main
+
+func main() {
+	// Create config
+	cfg := {...}
+
+	// Get service name
+	value := cfg.GetService()
+}
+```
+
 ### Get string value by key
 
 ```go
@@ -65,15 +79,34 @@ func main() {
 }
 ```
 
+### Set env map
+
+```go
+package main
+
+func main() {
+	// Create config
+	cfg := {...}
+
+	var envMap = map[string]string{
+		"ENV_KEY": "CONSUL_KV_KEY",
+	}
+
+	// Set env map
+	err := cfg.SetEnvMap(envMap)
+}
+```
+
 ## errors
 
 ### Types
 
-| Type           | Message      |
-|----------------|--------------|
-| ErrBadRequest  | bad_request  |
-| ErrUnauthorized| unauthorized |
-| ErrForbidden   | forbidden    |
+| Type                  | Message             |
+|-----------------------|---------------------|
+| ErrBadRequest         | bad_request         |
+| ErrUnauthorized       | unauthorized        |
+| ErrForbidden          | forbidden           |
+| ErrServiceUnavailable | service_unavailable |
 
 ### Create error
 
@@ -89,6 +122,22 @@ func main() {
 ```
 
 ## infra
+
+### Get Postgres KV keys
+
+```go
+package main
+
+import "github.com/flash-go/sdk/infra"
+
+func main() {
+	infra.PostgresHostOptKey
+	infra.PostgresPortOptKey
+	infra.PostgresUserOptKey
+	infra.PostgresPasswordOptKey
+	infra.PostgresDbOptKey
+}
+```
 
 ### Create Postgres client
 
@@ -109,6 +158,21 @@ func main() {
 			Migrations: nil,
 		},
 	)
+}
+```
+
+### Get Redis KV keys
+
+```go
+package main
+
+import "github.com/flash-go/sdk/infra"
+
+func main() {
+	infra.RedisHostOptKey
+	infra.RedisPortOptKey
+	infra.RedisPasswordOptKey
+	infra.RedisDbOptKey
 }
 ```
 
@@ -168,6 +232,18 @@ func main() {
 
 ## telemetry
 
+### Get telemetry KV keys
+
+```go
+package main
+
+import "github.com/flash-go/sdk/telemetry"
+
+func main() {
+	telemetry.OtelCollectorGrpcOptKey
+}
+```
+
 ### Create gRPC telemetry service
 
 ```go
@@ -176,17 +252,11 @@ package main
 import "github.com/flash-go/sdk/telemetry"
 
 func main() {
-	// Set service name
-	serviceName := "name"
-
-	// OTEL collector gRPC endpoint
-	endpoint := "localhost:4317"
+	// Create config
+	cfg := {...}
 
 	// Create telemetry service
-	telemetryService := telemetry.NewGrpc(
-		serviceName,
-		endpoint,
-	)
+	telemetryService := telemetry.NewGrpc(cfg)
 }
 ```
 
@@ -194,7 +264,7 @@ func main() {
 
 ### users
 
-Create JWT key
+#### Create JWT key
 
 ```go
 package main
@@ -207,5 +277,45 @@ func main() {
 
 	// Create key
 	key := users.NewJwtKey(size)
+}
+```
+
+#### Use users middleware
+
+```go
+package main
+
+import "github.com/flash-go/sdk/services/users"
+
+func main() {
+	// Create http client
+	httpClient := {...}
+
+	// Create http server
+	httpServer := {...}
+
+	// Set user service
+	userService := "users"
+
+	// Create users middleware
+	usersMiddleware := users.NewMiddleware(
+		&users.MiddlewareConfig{
+			UsersService: "users",
+			HttpClient:  httpClient,
+		},
+	)
+
+	// Set roles
+	roles := []string{"admin"}
+
+	// Use auth middleware
+	httpServer.AddRoute(
+		http.MethodGet,
+		"/",
+		func(ctx server.ReqCtx) {
+			ctx.WriteString("Hello")
+		},
+		usersMiddleware.Auth(true, roles),
+	)
 }
 ```

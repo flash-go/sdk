@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	redisHostOptKey     = "/redis/host"
-	redisPortOptKey     = "/redis/port"
-	redisPasswordOptKey = "/redis/password"
-	redisDbOptKey       = "/redis/db"
+	RedisHostOptKey     = "/redis/host"
+	RedisPortOptKey     = "/redis/port"
+	RedisPasswordOptKey = "/redis/password"
+	RedisDbOptKey       = "/redis/db"
 )
 
 type RedisClientConfig struct {
@@ -27,11 +27,11 @@ func NewRedisClient(config *RedisClientConfig) *redis.Client {
 	options := &redis.Options{
 		Addr: fmt.Sprintf(
 			"%s:%s",
-			config.Cfg.Get(redisHostOptKey),
-			config.Cfg.Get(redisPortOptKey),
+			config.Cfg.Get(RedisHostOptKey),
+			config.Cfg.Get(RedisPortOptKey),
 		),
-		Password: config.Cfg.Get(redisPasswordOptKey),
-		DB:       config.Cfg.GetInt(redisDbOptKey),
+		Password: config.Cfg.Get(RedisPasswordOptKey),
+		DB:       config.Cfg.GetInt(RedisDbOptKey),
 	}
 
 	// Create client

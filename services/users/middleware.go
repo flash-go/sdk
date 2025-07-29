@@ -63,7 +63,7 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 				},
 			)
 			if err != nil {
-				ctx.WriteErrorResponse(ErrAuthInternal)
+				ctx.WriteErrorResponse(errors.ErrServiceUnavailable)
 				return
 			}
 
@@ -81,7 +81,7 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 				client.WithRequestBodyOption(body),
 			)
 			if err != nil {
-				ctx.WriteErrorResponse(ErrAuthInternal)
+				ctx.WriteErrorResponse(errors.ErrServiceUnavailable)
 				return
 			}
 
@@ -91,7 +91,7 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 				// Parse response
 				var response tokenValidateResult
 				if err := json.Unmarshal(res.Body(), &response); err != nil {
-					ctx.WriteErrorResponse(ErrAuthInternal)
+					ctx.WriteErrorResponse(errors.ErrServiceUnavailable)
 					return
 				}
 
@@ -113,18 +113,17 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 				}
 
 				handler(ctx)
-			case 401:
+			case 400:
 				ctx.WriteErrorResponse(ErrAuthInvalidToken)
 			default:
-				ctx.WriteErrorResponse(ErrAuthInternal)
+				ctx.WriteErrorResponse(errors.ErrServiceUnavailable)
 			}
 		}
 	}
 }
 
 var (
-	ErrAuthInternal                = errors.New(errors.ErrServiceUnavailable, "internal_error")
-	ErrAuthInsufficientPermissions = errors.New(errors.ErrForbidden, "insufficient_permissions")
+	ErrAuthInsufficientPermissions = errors.New(errors.ErrForbidden, "insufficient_role_permissions")
 	ErrAuth2faRequired             = errors.New(errors.ErrUnauthorized, "2fa_required")
 	ErrAuthInvalidToken            = errors.New(errors.ErrUnauthorized, "invalid_token")
 )

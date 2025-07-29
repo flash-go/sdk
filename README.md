@@ -107,6 +107,7 @@ func main() {
 | ErrUnauthorized       | unauthorized        |
 | ErrForbidden          | forbidden           |
 | ErrServiceUnavailable | service_unavailable |
+| ErrNotFound           | not_found           |
 
 ### Create error
 
@@ -294,13 +295,13 @@ func main() {
 	// Create http server
 	httpServer := {...}
 
-	// Set user service
-	userService := "users"
+	// Set users service
+	usersService := "users"
 
 	// Create users middleware
 	usersMiddleware := users.NewMiddleware(
 		&users.MiddlewareConfig{
-			UsersService: "users",
+			UsersService: usersService,
 			HttpClient:  httpClient,
 		},
 	)

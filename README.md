@@ -296,7 +296,7 @@ func main() {
 	httpServer := {...}
 
 	// Set users service
-	usersService := "users"
+	usersService := "users-service"
 
 	// Create users middleware
 	usersMiddleware := users.NewMiddleware(
@@ -316,7 +316,12 @@ func main() {
 		func(ctx server.ReqCtx) {
 			ctx.WriteString("Hello")
 		},
-		usersMiddleware.Auth(true, roles),
+		usersMiddleware.Auth(
+			// Restrict access based on roles (optional)
+			users.WithAuthRolesOption(roles),
+			// Disable MFA validation (optional)
+			users.WithoutAuthMfaOption(),
+		),
 	)
 }
 ```

@@ -23,7 +23,7 @@ func NewMiddleware(config *MiddlewareConfig) Middleware {
 }
 
 type Middleware interface {
-	Auth(mfa bool, roles ...string) func(server.ReqHandler) server.ReqHandler
+	Auth(options ...AuthOption) func(server.ReqHandler) server.ReqHandler
 }
 
 type middleware struct {
@@ -46,7 +46,7 @@ type tokenValidateResult struct {
 	Audience []string `json:"audience"`
 }
 
-func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) server.ReqHandler {
+func (m *middleware) Auth(options ...AuthOption) func(server.ReqHandler) server.ReqHandler {
 	return func(handler server.ReqHandler) server.ReqHandler {
 		return func(ctx server.ReqCtx) {
 			// Get auth token
@@ -98,17 +98,20 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 				// Set data to ctx
 				ctx.SetUserValue("user", response.User)
 				ctx.SetUserValue("role", response.Role)
-				ctx.SetUserValue("mfa", response.Mfa)
+				ctx.SetUserValue("mfa_value", response.Mfa)
+				ctx.SetUserValue("mfa_validation", true)
 
-				// Check two factor
-				if mfa && response.Mfa {
-					ctx.WriteErrorResponse(ErrAuth2faRequired)
-					return
+				// Apply options
+				for _, option := range options {
+					if err := option.Apply(ctx, &response); err != nil {
+						ctx.WriteErrorResponse(err)
+						return
+					}
 				}
 
-				// Check role permissions
-				if len(roles) > 0 && !slices.Contains(roles, response.Role) {
-					ctx.WriteErrorResponse(ErrAuthInsufficientPermissions)
+				// Check two factor
+				if ctx.UserValue("mfa_validation").(bool) && response.Mfa {
+					ctx.WriteErrorResponse(ErrAuth2faRequired)
 					return
 				}
 
@@ -120,6 +123,41 @@ func (m *middleware) Auth(mfa bool, roles ...string) func(server.ReqHandler) ser
 			}
 		}
 	}
+}
+
+type AuthOption interface {
+	Apply(server.ReqCtx, *tokenValidateResult) error
+}
+
+// Auth options
+
+// Check role permissions
+type authRolesOption struct {
+	roles []string
+}
+
+func (h authRolesOption) Apply(ctx server.ReqCtx, response *tokenValidateResult) error {
+	if len(h.roles) > 0 && !slices.Contains(h.roles, response.Role) {
+		return ErrAuthInsufficientPermissions
+	}
+	return nil
+}
+
+func WithAuthRolesOption(roles ...string) authRolesOption {
+	return authRolesOption{roles}
+}
+
+// Without MFA checking
+type authMfaOption struct {
+}
+
+func (h authMfaOption) Apply(ctx server.ReqCtx, response *tokenValidateResult) error {
+	ctx.SetUserValue("mfa_validation", false)
+	return nil
+}
+
+func WithoutAuthMfaOption() authMfaOption {
+	return authMfaOption{}
 }
 
 var (

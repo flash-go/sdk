@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/base64"
 	"errors"
 	"log"
 	"os"
@@ -13,6 +14,7 @@ type Config interface {
 	GetService() string
 	Get(key string) string
 	GetInt(key string) int
+	GetBase64(key string) []byte
 	Set(key, value string) error
 	SetEnvMap(envMap map[string]string)
 }
@@ -53,6 +55,14 @@ func (c *config) GetInt(key string) int {
 	return v
 }
 
+func (c *config) GetBase64(key string) []byte {
+	v, err := base64.StdEncoding.DecodeString(c.Get(key))
+	if err != nil {
+		log.Fatalf("failed to parse base64 config key [%s]: %v", key, err)
+	}
+	return v
+}
+
 func (c *config) Set(key, value string) error {
 	k := c.service + key
 	_, err := c.state.GetValue(k)
@@ -68,4 +78,30 @@ func (c *config) SetEnvMap(envMap map[string]string) {
 			log.Fatalf("failed to create KV [%s]: %v", key, err)
 		}
 	}
+}
+
+// Env
+
+func GetEnvBool(key string) bool {
+	v, err := strconv.ParseBool(os.Getenv(key))
+	if err != nil {
+		log.Fatalf("failed to parse bool env value by key [%s]: %v", key, err)
+	}
+	return v
+}
+
+func GetEnvInt(key string) int {
+	v, err := strconv.Atoi(os.Getenv(key))
+	if err != nil {
+		log.Fatalf("failed to parse int env value by key [%s]: %v", key, err)
+	}
+	return v
+}
+
+func GetEnvBase64(key string) []byte {
+	v, err := base64.StdEncoding.DecodeString(os.Getenv(key))
+	if err != nil {
+		log.Fatalf("failed to parse base64 env value by key [%s]: %v", key, err)
+	}
+	return v
 }

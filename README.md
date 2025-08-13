@@ -1,6 +1,6 @@
 # sdk
 
-Reusable utilities written in Go for seamless integration with microservices built on the [Flash Framework](https://github.com/flash-go/flash). Designed to accelerate development, promote consistency, and simplify communication between distributed services.
+Software Development Kit written in Go for seamless integration with microservices built on the [Flash Framework](https://github.com/flash-go/flash). Designed to accelerate development, promote consistency, and simplify communication between distributed services.
 
 ## config
 
@@ -65,6 +65,20 @@ func main() {
 }
 ```
 
+### Get bytes from Base64 value by key
+
+```go
+package main
+
+func main() {
+	// Create config
+	cfg := {...}
+
+	// Get bytes from Base64 value by key
+	value := cfg.GetBase64("host")
+}
+```
+
 ### Set value by key
 
 ```go
@@ -94,6 +108,42 @@ func main() {
 
 	// Set env map
 	err := cfg.SetEnvMap(envMap)
+}
+```
+
+### Get env bool var 
+
+```go
+package main
+
+import "github.com/flash-go/sdk/config"
+
+func main() {
+	value := config.GetEnvBool("key")
+}
+```
+
+### Get env int var 
+
+```go
+package main
+
+import "github.com/flash-go/sdk/config"
+
+func main() {
+	value := config.GetEnvInt("key")
+}
+```
+
+### Get env bytes from Base64 var 
+
+```go
+package main
+
+import "github.com/flash-go/sdk/config"
+
+func main() {
+	value := config.GetEnvBase64("key")
 }
 ```
 
@@ -215,7 +265,7 @@ func main() {
 
 ## state
 
-### Create state service
+### Create insecure state service without auth token
 
 ```go
 package main
@@ -223,11 +273,93 @@ package main
 import "github.com/flash-go/sdk/state"
 
 func main() {
-	// Set service name
-	serviceName := "name"
+	// Full address (host:port) of the Consul agent (e.g., `localhost:8500`)
+	consulAddress := "localhost:8501"
 
 	// Create state service
-	stateService := state.New(serviceName)
+	stateService := state.NewWithoutAuth(consulAddress)
+}
+```
+
+### Create insecure state service with auth token
+
+```go
+package main
+
+import "github.com/flash-go/sdk/state"
+
+func main() {
+	// Full address (host:port) of the Consul agent (e.g., `localhost:8500`)
+	consulAddress := "localhost:8501"
+
+	// Consul ACL token for authenticating requests to the Consul agent or server
+	authToken := "secret"
+
+	// Create state service
+	stateService := state.NewWithInsecureAuth(
+		&state.InsecureAuthConfig{
+			Address: consulAddress,
+			Token: authToken,
+		},
+	)
+}
+```
+
+### Create secure state service with auth token
+
+```go
+package main
+
+import "github.com/flash-go/sdk/state"
+
+func main() {
+	// Full address (host:port) of the Consul agent (e.g., `localhost:8500`)
+	consulAddress := "localhost:8501"
+
+	// Base64 CA certificate file used to verify the Consul server's TLS certificate
+	ca := "secret"
+
+	// Base64 client certificate file used for mTLS authentication with Consul
+	cert := "secret"
+
+	// Base64 private key corresponding to `CONSUL_CLIENT_CRT` for mTLS authentication
+	key := "secret"
+
+	// If set to `true`, disables TLS certificate verification (not recommended for production)
+	insecureSkipVerify := false
+
+	// Consul ACL token for authenticating requests to the Consul agent or server
+	authToken := "secret"
+
+	// Create state service
+	stateService := state.NewWithSecureAuth(
+		&state.SecureAuthConfig{
+			Address: consulAddress,
+			CAPem: ca,
+			CertPEM: cert,
+			KeyPEM: key,
+			InsecureSkipVerify: insecureSkipVerify,
+			Token: authToken,
+		},
+	)
+}
+```
+
+### Create custom state
+
+```go
+package main
+
+import (
+	"github.com/flash-go/sdk/state"
+	"github.com/hashicorp/consul/api"
+)
+
+func main() {
+	// Create state service
+	stateService := state.New(
+		&api.Config{...},
+	)
 }
 ```
 
@@ -242,10 +374,13 @@ import "github.com/flash-go/sdk/telemetry"
 
 func main() {
 	telemetry.OtelCollectorGrpcOptKey
+	telemetry.OtelCollectorCaCrtOptKey
+	telemetry.OtelCollectorClientCrtOptKey
+	telemetry.OtelCollectorClientKeyOptKey
 }
 ```
 
-### Create gRPC telemetry service
+### Create insecure grpc telemetry service
 
 ```go
 package main
@@ -257,7 +392,23 @@ func main() {
 	cfg := {...}
 
 	// Create telemetry service
-	telemetryService := telemetry.NewGrpc(cfg)
+	telemetryService := telemetry.NewInsecureGrpc(cfg)
+}
+```
+
+### Create secure grpc telemetry service
+
+```go
+package main
+
+import "github.com/flash-go/sdk/telemetry"
+
+func main() {
+	// Create config
+	cfg := {...}
+
+	// Create telemetry service
+	telemetryService := telemetry.NewSecureGrpc(cfg)
 }
 ```
 

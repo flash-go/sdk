@@ -37,6 +37,7 @@ type tokenValidateRequest struct {
 
 type tokenValidateResult struct {
 	Id       string   `json:"id"`
+	Device   string   `json:"device"`
 	User     uint     `json:"user"`
 	Role     string   `json:"role"`
 	Mfa      bool     `json:"mfa"`
@@ -96,6 +97,7 @@ func (m *middleware) Auth(options ...AuthOption) func(server.ReqHandler) server.
 				}
 
 				// Set data to ctx
+				ctx.SetUserValue("device", response.Device)
 				ctx.SetUserValue("user", response.User)
 				ctx.SetUserValue("role", response.Role)
 				ctx.SetUserValue("mfa_value", response.Mfa)

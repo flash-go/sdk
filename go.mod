@@ -3,7 +3,7 @@ module github.com/flash-go/sdk
 go 1.24.0
 
 require (
-	github.com/flash-go/flash v1.0.0-rc12
+	github.com/flash-go/flash v1.0.0-rc13
 	github.com/go-gormigrate/gormigrate/v2 v2.1.4
 	github.com/hashicorp/consul/api v1.32.1
 	github.com/redis/go-redis/extra/redisotel/v9 v9.11.0

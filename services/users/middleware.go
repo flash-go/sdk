@@ -81,6 +81,7 @@ func (m *middleware) Auth(options ...AuthOption) func(server.ReqHandler) server.
 				// Body opt
 				client.WithRequestBodyOption(body),
 			)
+			
 			if err != nil {
 				ctx.WriteErrorResponse(errors.ErrServiceUnavailable)
 				return

@@ -51,8 +51,8 @@ github.com/fasthttp/router v1.5.4/go.mod h1:3/hysWq6cky7dTfzaaEPZGdptwjwx0qzTgFC
 github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYFFOfk=
 github.com/fatih/color v1.18.0 h1:S8gINlzdQ840/4pfAwic/ZE0djQEH3wM94VfqLTZcOM=
 github.com/fatih/color v1.18.0/go.mod h1:4FelSpRwEGDpQ12mAdzqdOukCy4u8WUtOY6lkT/6HfU=
-github.com/flash-go/flash v1.0.0-rc12 h1:j6onBdOlHdPxm9dVLsC3zC914m7uJ57Ck89j+oEHkuM=
-github.com/flash-go/flash v1.0.0-rc12/go.mod h1:4/4CNQ6j0KGzYGJz0e1xN0leS9gvScg0XMMshVGNFRw=
+github.com/flash-go/flash v1.0.0-rc13 h1:s6ny9W2+Wa3ZLP394mFQ4Dr5YKTiBf2n4pdnBMvEVlI=
+github.com/flash-go/flash v1.0.0-rc13/go.mod h1:4/4CNQ6j0KGzYGJz0e1xN0leS9gvScg0XMMshVGNFRw=
 github.com/go-faster/city v1.0.1 h1:4WAxSZ3V2Ws4QRDrscLEDcibJY8uf41H6AhXDrNDcGw=
 github.com/go-faster/city v1.0.1/go.mod h1:jKcUJId49qdW3L1qKHH/3wPeUstCVpVSXTM6vO3VcTw=
 github.com/go-faster/errors v0.7.1 h1:MkJTnDoEdi9pDabt1dpWf7AA8/BaSYZqibYyhZ20AYg=

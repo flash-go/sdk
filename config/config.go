@@ -82,6 +82,10 @@ func (c *config) SetEnvMap(envMap map[string]string) {
 
 // Env
 
+func GetEnvStr(key string) string {
+	return os.Getenv(key)
+}
+
 func GetEnvBool(key string) bool {
 	v, err := strconv.ParseBool(os.Getenv(key))
 	if err != nil {
